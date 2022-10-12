@@ -8,6 +8,7 @@
 
 package com.github.brunopacheco1.qengine;
 
-public class qengineJNI {
-  public final static native double run_circuit(long jarg1);
+public class QRuleEngine {
+  
+  public native double runCircuit(long test);
 }

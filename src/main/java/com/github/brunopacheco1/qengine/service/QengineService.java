@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.github.brunopacheco1.qengine.QRuleEngine;
 import com.github.brunopacheco1.qengine.bean.Input;
 import com.github.brunopacheco1.qengine.bean.Output;
 
@@ -19,14 +20,18 @@ public class QengineService {
         "10000", Output.builder().ruleId("5").build()
     );
 
+    private final QRuleEngine engine = new QRuleEngine();
+
     public Output hitRules(Input input) {
-        initializeQubits(input);
-        return Output.builder().build();
+        var inputStr = parseInput(input);
+        var outputKey = engine.runCircuit(inputStr);
+        return rules.get(outputKey);
     }
 
-    private void initializeQubits(Input input) {
+    private String parseInput(Input input) {
         var input1 = parseInput1(input);
         var input2 = parseInput2(input);
+        return input2 + input1;
     }
 
     private String parseInput1(Input input) {

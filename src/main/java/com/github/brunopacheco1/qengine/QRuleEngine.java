@@ -2,5 +2,5 @@ package com.github.brunopacheco1.qengine;
 
 public class QRuleEngine {
   
-  public native void runCircuit();
+  public native String runCircuit(String input);
 }

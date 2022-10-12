@@ -76,19 +76,18 @@
 						<compilerStartOption>-fPIC</compilerStartOption>
 						<compilerStartOption>-I${JAVA_HOME}/include</compilerStartOption>
 						<compilerStartOption>-I${JAVA_HOME}/include/linux</compilerStartOption>
-						<compilerStartOption>-liqs</compilerStartOption>
 					</compilerStartOptions>
 					<linkerOutputDirectory>target</linkerOutputDirectory>
 					<linkerExecutable>g++</linkerExecutable>
 					<!-- linker options -->
 					<linkerStartOptions>
 						<linkerStartOption>-shared</linkerStartOption>
-						<linkerStartOption>-liqs</linkerStartOption>
 						<linkerStartOption>-fPIC</linkerStartOption>
 						<linkerStartOption>-lc</linkerStartOption>
 					</linkerStartOptions>
 					<linkerEndOptions>
 						<linkerEndOption>-o ${project.build.directory}/lib/libqengine.so</linkerEndOption>
+						<linkerEndOption>-liqs</linkerEndOption>
 					</linkerEndOptions>
 				</configuration>
 				<executions>
@@ -103,6 +102,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- It is not necessary to run it every time, as the contract will not change. Keeping it to not forget.
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -126,6 +126,7 @@
 					</execution>
 				</executions>
 			</plugin>
+		-->
 		</plugins>
 	</build>
 </project>

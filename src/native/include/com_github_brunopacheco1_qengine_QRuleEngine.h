@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_github_brunopacheco1_qengine_QRuleEngine
  * Method:    runCircuit
- * Signature: ()V
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT void JNICALL Java_com_github_brunopacheco1_qengine_QRuleEngine_runCircuit
-  (JNIEnv *, jobject);
+JNIEXPORT jstring JNICALL Java_com_github_brunopacheco1_qengine_QRuleEngine_runCircuit
+  (JNIEnv *, jobject, jstring);
 
 #ifdef __cplusplus
 }

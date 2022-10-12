@@ -11,7 +11,7 @@ public class QengineApplication {
 	}
 
 	public static void main(String[] args) {
-		QRuleEngine.runCircuit(1);
+		new QRuleEngine().runCircuit();
 		SpringApplication.run(QengineApplication.class, args);
 	}
 }

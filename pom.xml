@@ -53,6 +53,7 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<jvmArguments>-Djava.library.path=./lib</jvmArguments>
 				</configuration>
 			</plugin>
 		</plugins>

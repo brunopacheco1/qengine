@@ -24,14 +24,14 @@ public class QengineService {
 
     public Output hitRules(Input input) {
         var inputStr = parseInput(input);
-        var outputKey = engine.runCircuit(inputStr);
+        var outputKey = engine.runJavaCircuit(inputStr);
         return rules.get(outputKey);
     }
 
     private String parseInput(Input input) {
         var input1 = parseInput1(input);
         var input2 = parseInput2(input);
-        return input2 + input1;
+        return "0000000" + input2 + input1;
     }
 
     private String parseInput1(Input input) {

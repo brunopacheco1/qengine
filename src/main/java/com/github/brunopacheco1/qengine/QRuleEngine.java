@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.redfx.strange.Program;
+import org.redfx.strange.Result;
 import org.redfx.strange.Step;
 import org.redfx.strange.gate.Toffoli;
 import org.redfx.strange.gate.X;
@@ -13,31 +14,11 @@ import org.redfx.strange.local.SimpleQuantumExecutionEnvironment;
 
 public class QRuleEngine {
 
-  public native String runCircuit(String input);
+  private final Program circuit;
+  private final SimpleQuantumExecutionEnvironment environment;
 
-  public String runJavaCircuit(String input) {
-    var sqee = new SimpleQuantumExecutionEnvironment();
-
-    var circuit = initilize(input);
-
-    var res = sqee.runProgram(circuit);
-    var qubits = res.getQubits();
-    var result = new StringBuilder()
-        .append(qubits[8].measure())
-        .append(qubits[7].measure())
-        .append(qubits[6].measure())
-        .append(qubits[5].measure())
-        .append(qubits[4].measure()).toString();
-    return result;
-  }
-
-  private Program initilize(String input) {
-    var circuit = new Program(11);
-
-    var chars = input.toCharArray();
-    for (int i = chars.length - 1, j = 0; i >= 0; i--, j++) {
-      circuit.initializeQubit(j, Double.parseDouble(String.valueOf(chars[i])));
-    }
+  public QRuleEngine() {
+    circuit = new Program(11);
 
     rule1(circuit);
     rule2(circuit);
@@ -45,7 +26,37 @@ public class QRuleEngine {
     rule4(circuit);
     rule5(circuit);
 
-    return circuit;
+    environment = new SimpleQuantumExecutionEnvironment();
+  }
+
+  public native String runCircuit(String input);
+
+  public synchronized String runJavaCircuit(String input) {
+    initilize(input);
+    var result = environment.runProgram(circuit);
+    return parseResult(result);
+  }
+
+  private void initilize(String input) {
+    var chars = input.toCharArray();
+    for (int i = chars.length - 1; i >= 0; i--) {
+      var value = chars[i];
+      if(value == '1') {
+        circuit.initializeQubit(i, 0D);
+      } else {
+        circuit.initializeQubit(i, 1D);
+      }
+    }
+  }
+
+  private String parseResult(Result result) {
+    var qubits = result.getQubits();
+    return new StringBuilder()
+        .append(qubits[8].measure())
+        .append(qubits[7].measure())
+        .append(qubits[6].measure())
+        .append(qubits[5].measure())
+        .append(qubits[4].measure()).toString();
   }
 
   private void rule1(Program program) {
@@ -116,7 +127,7 @@ public class QRuleEngine {
         int i = counter.getAndIncrement();
         step2.addGate(new Toffoli(controlQubits[j], ancillas[i], ancillas[i + 1]));
       });
-      program.addStep(step);
+      program.addStep(step2);
     }
 
     step = new Step();
@@ -131,7 +142,7 @@ public class QRuleEngine {
         int i = counter.getAndDecrement();
         step3.addGate(new Toffoli(controlQubits[j], ancillas[i - 1], ancillas[i]));
       });
-      program.addStep(step);
+      program.addStep(step3);
     }
 
     step = new Step();

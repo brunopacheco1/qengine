@@ -37,8 +37,8 @@ public class QengineService {
     private String parseInput1(Input input) {
         var value = Optional.ofNullable(input).map(Input::getInput1).orElse("");
         switch(value) {
-            case "A": return "10";
-            case "B": return "01";
+            case "A": return "01";
+            case "B": return "10";
             default: return "00";
         }
     }
@@ -46,8 +46,8 @@ public class QengineService {
     private String parseInput2(Input input) {
         var value = Optional.ofNullable(input).map(Input::getInput2).orElse("");
         switch(value) {
-            case "A": return "10";
-            case "B": return "01";
+            case "A": return "01";
+            case "B": return "10";
             default: return "00";
         }
     }

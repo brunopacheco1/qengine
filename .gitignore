@@ -1,38 +1,13 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+dist/
+.venv/
+.pytest_cache/
 
-### VS Code ###
+# Editors and OS
+.idea/
 .vscode/
-
-*.so
-*.cxx
-*.o
-*.class
+.DS_Store

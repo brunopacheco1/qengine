@@ -20,6 +20,9 @@ solutions.
 - [x] Forward evaluation, `evaluate(input1, input2) -> rule` (`engine.py`)
 - [x] Tests: full decision table, and `cudaq.adjoint(apply_rules, q)` returns
       the flags to `|0>` for all 16 input states
+- [x] Helpers to read a state at the Phase 1 checkpoints (`statevector.py`)
+- [x] Phase 1 acceptance tests (`tests/test_grover.py`), skipped until
+      `grover.py` provides the functions they call
 - [ ] Phase 1: Grover reverse search
 - [ ] Phase 2: cost accounting against classical approaches
 - [ ] Phase 3: noise and real hardware
@@ -31,12 +34,31 @@ solutions.
 |---|---|
 | Qubit layout | q0-1 `input1` (A, B), q2-3 `input2` (A, B), q4-8 rule flags 1-5 |
 | `cudaq.sample` bitstrings | **qubit 0 first**: only q2 set prints as `"0010"` |
-| `cudaq.get_state` indices | **little-endian**: amplitude index = q0 + 2·q1 + 4·q2 + 8·q3 + ... |
+| `numpy.array(state)` indices | **little-endian**: amplitude index = q0 + 2·q1 + 4·q2 + 8·q3 + ... |
+| `state[i]` indices | **big-endian**, the opposite: with 9 qubits, only q2 set is `state[64]` |
+| `state.amplitude("0010...")` | **qubit 0 first**, like `sample` |
 | Kernels | must live in a `.py` file; CUDA-Q reads their source |
 | Measuring a sub-register | `mz(q[0:4])` works and returns 4-character bitstrings |
 
-The two bit orders differ. Mixing them up is the most likely source of "Grover
-amplified the wrong state" bugs.
+The bit orders differ. Mixing them up is the most likely source of "Grover
+amplified the wrong state" bugs. The index numbers in the checkpoints below
+are `numpy.array(state)` indices.
+
+To stay in one order, read a state with the helpers in
+`src/qengine/statevector.py`. They use the `sample` order for everything:
+
+```python
+state = cudaq.get_state(my_kernel)
+input_amplitudes(state)     # {"0000": (0.25+0j), "0001": ...}, the 16 input states
+input_probabilities(state)  # the same, as probabilities
+leaked_probability(state)   # probability that a flag or ancilla is not 0
+```
+
+"Nothing above index 15" in a checkpoint is `leaked_probability(state) == 0`.
+Do not call `get_state` on a kernel that measures: the `mz` runs too, and you
+get back one collapsed basis state, a different one on each call. Keep the
+measurement out of the kernel you inspect, for example behind a `bool`
+argument, which `cudaq.sample` and `cudaq.get_state` both accept.
 
 ## Phase 1: Grover reverse search
 
@@ -142,16 +164,33 @@ Expected results (sample bitstring order, q0 first):
 | 4 | (None, B), (B, B) | `0001`, `0101` |
 | 5 | (None, None), (B, None) | `0000`, `0100` |
 
-Suggested tests:
+These tests are already written in `tests/test_grover.py`. They are skipped
+while `src/qengine/grover.py` does not exist, and each group starts to run
+when the function it calls exists. They assume two plain Python functions
+and nothing about the kernels behind them. The names are a proposal: rename
+them in the test file if you prefer others.
 
-- **Always the same result** (uses `get_state`, no sampling): rule 3 with
-  k = 3 has at least 0.96 probability on `0010`. Rule 1 with k = 2 has about
-  0.945 split between `1010` and `0110`.
-- **Uncompute:** for every rule and k, no probability above state-vector
-  index 15.
-- **End to end:** `find_inputs(rule)` returns the table above for every rule.
-  This one samples, so use enough shots that missing a match is negligible.
-- **Validity:** no invalid encoding is ever returned.
+| Function | Contract |
+|---|---|
+| `grover_state(rule, iterations) -> cudaq.State` | the state after the preparation and `iterations` rounds of oracle + diffusion, with no measurement |
+| `find_inputs(rule) -> list[tuple[Value, Value]]` | every valid input pair that hits `rule` |
+
+- **Always the same result** (`grover_state`, no sampling): with 0 iterations
+  every input has probability 1/16. For every rule and k = 1 to 4 the
+  probability on the valid matches is `sin²((2k+1)·θ)`, shared equally. So
+  rule 3 with k = 3 has at least 0.96 on `0010`, and rule 1 with k = 2 has
+  about 0.945 split between `1010` and `0110`.
+- **Uncompute** (`grover_state`): for every rule and k, no probability above
+  state-vector index 15.
+- **Validity** (`grover_state`): after one iteration no invalid encoding has
+  more than its starting probability of 1/16.
+- **End to end** (`find_inputs`): returns the table above for every rule, with
+  no duplicates, and every returned pair hits the rule when checked with
+  `evaluate`. This one samples, so use enough shots that missing a match is
+  negligible.
+
+`grover_state` can be written as soon as step 1.4 works, so the state tests
+give feedback before `find_inputs` exists.
 
 ## Phase 2: cost accounting
 

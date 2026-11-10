@@ -42,7 +42,8 @@ exclude it. CUDA-Q bitstrings list **qubit 0 first**.
 | `src/qengine/encoding.py` | input values to qubits and back |
 | `src/qengine/rules.py` | the rule circuit (`apply_rules` kernel) |
 | `src/qengine/engine.py` | forward evaluation: input pair to rule id |
-| `tests/` | the full decision table and an uncompute check |
+| `src/qengine/statevector.py` | read a simulated state in `sample` bit order |
+| `tests/` | the full decision table, an uncompute check, and the Phase 1 acceptance tests (skipped until `grover.py` exists) |
 | `docs/` | the [implementation plan](docs/implementation-plan.md) |
 | `AGENTS.md` | instructions for AI coding agents |
 

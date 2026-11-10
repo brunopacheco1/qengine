@@ -43,6 +43,9 @@ pip install -e ".[test]" && pytest -q
 Works on Linux (x86_64, ARM64) and macOS on Apple silicon (CPU simulation). CUDA-Q 0.16 has
 wheels for Python 3.11 to 3.14 only, so a newer default `python3` will not install it.
 
+CI (`.github/workflows/tests.yml`) runs the same `pytest` on Linux with Python 3.11 and 3.14
+for every pull request and every push to `main`.
+
 ## Rules
 
 - **Facts.** Check CUDA-Q behaviour by running it in the `.venv`, not from memory. The

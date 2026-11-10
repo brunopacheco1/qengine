@@ -45,6 +45,7 @@ exclude it. CUDA-Q bitstrings list **qubit 0 first**.
 | `src/qengine/statevector.py` | read a simulated state in `sample` bit order |
 | `tests/` | the full decision table, an uncompute check, and the Phase 1 acceptance tests (skipped until `grover.py` exists) |
 | `docs/` | the [implementation plan](docs/implementation-plan.md) |
+| `.github/workflows/tests.yml` | CI: runs the tests on every pull request |
 | `AGENTS.md` | instructions for AI coding agents |
 
 ## Setup

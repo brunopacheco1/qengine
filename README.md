@@ -8,7 +8,8 @@ forward gives no quantum advantage: the circuit only uses X and
 multi-controlled X gates on basis states, so it computes exactly what a few
 boolean operations would. The interesting direction is the reverse
 question, *which inputs hit a given rule?*, which is a search problem that
-Grover's algorithm can address.
+Grover's algorithm can address. See the
+[implementation plan](docs/implementation-plan.md).
 
 ## The rules
 
@@ -42,6 +43,8 @@ exclude it. CUDA-Q bitstrings list **qubit 0 first**.
 | `src/qengine/rules.py` | the rule circuit (`apply_rules` kernel) |
 | `src/qengine/engine.py` | forward evaluation: input pair to rule id |
 | `tests/` | the full decision table and an uncompute check |
+| `docs/` | the [implementation plan](docs/implementation-plan.md) |
+| `AGENTS.md` | instructions for AI coding agents |
 
 ## Setup
 

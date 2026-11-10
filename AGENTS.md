@@ -14,7 +14,11 @@ inputs hit a rule?) with Grover's algorithm and compares the cost with classical
 - `src/qengine/encoding.py`: input values to qubits and back; detects invalid `11` encodings.
 - `src/qengine/rules.py`: the rule circuit, the `apply_rules` kernel.
 - `src/qengine/engine.py`: forward evaluation, `evaluate(input1, input2) -> rule`.
-- `tests/`: the full decision table and the uncompute check.
+- `src/qengine/statevector.py`: read a `cudaq.State` in `sample` bit order, for the plan's
+  checkpoints.
+- `tests/`: the full decision table, the uncompute check, and `test_grover.py`, the Phase 1
+  acceptance tests, skipped until `src/qengine/grover.py` provides `grover_state` and
+  `find_inputs`.
 
 Status and next steps: [docs/implementation-plan.md](docs/implementation-plan.md).
 
@@ -39,6 +43,9 @@ pip install -e ".[test]" && pytest -q
 Works on Linux (x86_64, ARM64) and macOS on Apple silicon (CPU simulation). CUDA-Q 0.16 has
 wheels for Python 3.11 to 3.14 only, so a newer default `python3` will not install it.
 
+CI (`.github/workflows/tests.yml`) runs the same `pytest` on Linux with Python 3.11 and 3.14
+for every pull request and every push to `main`.
+
 ## Rules
 
 - **Facts.** Check CUDA-Q behaviour by running it in the `.venv`, not from memory. The
@@ -62,9 +69,12 @@ wheels for Python 3.11 to 3.14 only, so a newer default `python3` will not insta
 
 ## Gotchas
 
-- **Two bit orders.** `cudaq.sample` bitstrings put qubit 0 first (only q2 set prints as
-  `"0010"`), but `cudaq.get_state` indexes amplitudes little-endian (index = q0 + 2·q1 +
-  4·q2 + ...).
+- **Three bit orders.** `cudaq.sample` bitstrings and `state.amplitude("0010...")` put
+  qubit 0 first (only q2 set prints as `"0010"`). `numpy.array(state)` is little-endian
+  (index = q0 + 2·q1 + 4·q2 + ...). `state[i]` is big-endian, the opposite. Use the helpers
+  in `statevector.py`, which stay in the `sample` order.
+- **`get_state` runs measurements.** On a kernel with `mz` it returns one collapsed basis
+  state, a different one per call. Inspect a kernel without the measurement.
 - **Kernels need a source file.** `@cudaq.kernel` reads the function's source, so kernels
   piped through stdin or defined in a plain REPL fail. Put them in a `.py` file.
 - **Invalid encodings still hit rules.** `11` inputs hit rules 1, 2 and 3 (4 of them hit
